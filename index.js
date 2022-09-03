@@ -85,7 +85,7 @@ function onError(e) {
 function help() {
 	const self = path.basename(__filename);
 	console.log(`
-    This script will wrap bootstrap icon svgs into functions.
+    This script will wrap (bootstrap) icon svgs as functions.
     ${yellow('Usage:')}
         node ${self} build [--indir ${INDIR}] [--outdir ${OUTDIR}] [--silent]
 
