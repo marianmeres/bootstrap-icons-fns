@@ -96,29 +96,3 @@ function help() {
 function ucfirst(str) {
 	return `${str}`.charAt(0).toUpperCase() + `${str}`.slice(1);
 }
-
-function escapeRegex(str) {
-	return `${str}`.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function replaceMap(str, map, ignoreCase = false) {
-	if (ignoreCase) {
-		map = Object.entries(map).reduce(
-			(memo, [k, v]) => ({ ...memo, [k.toLowerCase()]: v }),
-			{}
-		);
-	}
-	let patterns = [];
-	Object.keys(map).forEach((k) => patterns.push(escapeRegex(k)));
-	let regExp = new RegExp(patterns.join('|'), 'g' + (ignoreCase ? 'i' : ''));
-	return str.replace(regExp, (match) => {
-		if (ignoreCase) {
-			match = match.toLowerCase();
-		}
-		let replaced = typeof map[match] === 'function' ? map[match]() : map[match];
-		if (replaced === null || replaced === void 0) {
-			return '';
-		}
-		return replaced;
-	});
-}
