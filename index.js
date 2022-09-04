@@ -9,6 +9,7 @@ const args = require('minimist')(process.argv.slice(2));
 const COMMAND = args._[0];
 const INDIR = args.indir || '../_sandbox/icons/icons';
 const OUTDIR = args.outdir || './build/bs-icons';
+const FN_PREFIX = args["fn-prefix"] || 'bsIcon';
 
 // return early with help?
 const isHelp = !!args.h || !!args.help || !COMMAND;
@@ -41,24 +42,20 @@ async function build() {
 		const _outDir = path.join(process.cwd(), OUTDIR);
 		totalist(INDIR, (name, abs, stats) => {
 			if (/\.svg/i.test(name)) {
-				const id = name
-					.replace(/\.svg$/, '')
-					.split(/[\/-]/)
-					.filter(Boolean)
-					.map((v, i) => (i ? ucfirst(v) : v))
-					.join('');
+				const id = safeId(name.replace(/\.svg$/, ''))
 
 				const svg = fs
 					.readFileSync(abs, 'utf8')
 					.replace(/[\n\r]/g, ' ')
 					.replace(' xmlns="http://www.w3.org/2000/svg"', '')
-					.replace(/ class="[^"]+"/, ' class="${extraCls || \'\'}"')
-					.replace(/ width="[^"]+"/, ' width="${size}"')
-					.replace(/ height="[^"]+"/, ' height="${size}"')
+					.replace(/ class="[^"]+"/, '')
+					.replace(/ width="[^"]+"/, '')
+					.replace(/ height="[^"]+"/, '')
+					.replace("<svg ", '<svg class="${extraCls || \'\'}" width="${size}" height="${size}" ')
 					.replace(/>\s+</g, '><')
 					.trim();
 
-				const fnName = `bsIcon${ucfirst(id)}`;
+				const fnName = `${safeId(FN_PREFIX)}${ucfirst(id)}`;
 				const fn = `// prettier-ignore
 export const ${fnName} = (extraCls = null, size = 16) => \`${svg}\`;
 `;
@@ -87,7 +84,7 @@ function help() {
 	console.log(`
     This script will wrap (bootstrap) icon svgs as functions.
     ${yellow('Usage:')}
-        node ${self} build [--indir ${INDIR}] [--outdir ${OUTDIR}] [--silent]
+        node ${self} build [--indir ${INDIR}] [--outdir ${OUTDIR}] [--fn-prefix ${FN_PREFIX}] [--silent]
 
 `);
 	process.exit();
@@ -95,4 +92,12 @@ function help() {
 
 function ucfirst(str) {
 	return `${str}`.charAt(0).toUpperCase() + `${str}`.slice(1);
+}
+
+function safeId(name) {
+	return name
+		.split(/[\/-]/)
+		.filter(Boolean)
+		.map((v, i) => (i ? ucfirst(v) : v))
+		.join('');
 }
