@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prettier": "prettier --write index.js",
     "build": "node index.js build",
+    "build-ejs": "node index.js build-ejs",
     "help": "node index.js help"
   },
   "repository": {
